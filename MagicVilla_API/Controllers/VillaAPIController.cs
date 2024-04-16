@@ -38,8 +38,17 @@ namespace MagicVilla_API.Controllers
         {
             if (villaDTO == null)
                 return BadRequest(villaDTO);
+            
             if (villaDTO.Id > 0)
                 return StatusCode(StatusCodes.Status500InternalServerError, "Villa ID should be zero.");
+
+            if (VillaStorage.villaList.FirstOrDefault(x => x.Name.Equals(villaDTO.Name, StringComparison.CurrentCultureIgnoreCase)) != null)
+            {
+                //return BadRequest("Villa already exists");
+                ModelState.AddModelError("CustomError", "Villa already exists");
+                return BadRequest(ModelState);
+            }
+                
             
             villaDTO.Id = VillaStorage.villaList.OrderByDescending(x => x.Id).FirstOrDefault().Id + 1;
             VillaStorage.villaList.Add(villaDTO);
