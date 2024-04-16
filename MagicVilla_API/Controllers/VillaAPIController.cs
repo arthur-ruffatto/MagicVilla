@@ -15,5 +15,12 @@ namespace MagicVilla_API.Controllers
         {
             return VillaStorage.villaList;
         }
+
+        [HttpGet("{id: int}")]
+        public VillaDTO GetVilla(int id)
+        {
+            var villa = VillaStorage.villaList.FirstOrDefault(x => x.Id == id);
+            return villa;//?? new VillaDTO();
+        }
     }
 }
