@@ -11,14 +11,14 @@ namespace MagicVilla_API.Controllers
     [ApiController]
     public class VillaAPIController : ControllerBase
     {
-        [HttpGet]
+        [HttpGet("Get")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<VillaDTO>> GetVillas()
         {
             return Ok(VillaStorage.villaList);
         }
 
-        [HttpGet("{id}", Name = "GetVilla")]
+        [HttpGet("Get/{id}", Name = "GetVilla")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -31,7 +31,7 @@ namespace MagicVilla_API.Controllers
             return villa == null ? NotFound("Villa not found") : Ok(villa);
         }
 
-        [HttpPost]
+        [HttpPost("Create")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -57,7 +57,7 @@ namespace MagicVilla_API.Controllers
             return CreatedAtRoute("GetVilla", new { id = villaDTO.Id}, villaDTO);
         }
 
-        [HttpDelete("{id}", Name = "DeleteVilla")]
+        [HttpDelete("Delete/{id}", Name = "DeleteVilla")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -75,7 +75,7 @@ namespace MagicVilla_API.Controllers
             return Ok("Deleted");
         }
 
-        [HttpPut("{id}", Name = "UpdateVilla")]
+        [HttpPut("Put/{id}", Name = "UpdateVilla")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -99,7 +99,7 @@ namespace MagicVilla_API.Controllers
             return Ok("Villa updated");
         }
 
-        [HttpPatch("{id}", Name = "UpdatePartialVilla")]
+        [HttpPatch("Patch/{id}", Name = "UpdatePartialVilla")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
