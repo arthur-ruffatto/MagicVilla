@@ -103,7 +103,7 @@ namespace MagicVilla_API.Controllers
                 return NotFound("Villa not found");
 
             villa.Name = villaDTO.Name;
-            villa.Sqrmt = villaDTO.Sqrmt;
+            villa.SqrMt = villaDTO.SqrMt;
             villa.Occupancy = villaDTO.Occupancy;
 
             return Ok("Villa updated");
