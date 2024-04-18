@@ -1,3 +1,5 @@
+using MagicVilla_API.Data;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Example of how to implement Serilog to log to a file instead of the built-in logger
 //Log.Logger = new LoggerConfiguration().MinimumLevel.Information().WriteTo.File("log/villalogs.txt", rollingInterval: RollingInterval.Day).CreateLogger();
 //builder.Host.UseSerilog();
+
+builder.Services.AddDbContext<ApplicationDbContext>(option => { option.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerConnection")); });
 
 builder.Services
     .AddControllers(option => { option.ReturnHttpNotAcceptable = true; })
