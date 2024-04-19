@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(option => { option.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerConnection")); });
 
 builder.Services
-    .AddControllers(option => { option.ReturnHttpNotAcceptable = true; })
+    .AddControllers(/*option => { option.ReturnHttpNotAcceptable = true; }*/)
     .AddNewtonsoftJson()
     .AddXmlDataContractSerializerFormatters();
 

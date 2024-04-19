@@ -3,24 +3,24 @@ using MagicVilla_API.Models;
 using MagicVilla_API.Models.DTO;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace MagicVilla_API.Controllers
 {
+    //TODO: Add Try/Catch handling to all endpoints
+    //TODO: Review patch endpoint after automapper
+
     //[Route("api/VillaAPI")]
     [Route("api/[controller]")]
     [ApiController]
     public class VillaAPIController : ControllerBase
     {
         public ILogger<VillaAPIController> _logger { get; }
+        private readonly ApplicationDbContext _db;
 
-        public VillaAPIController(ILogger<VillaAPIController> logger)
+        public VillaAPIController(ILogger<VillaAPIController> logger, ApplicationDbContext db)
         {
             _logger = logger;
-        }
-
-        private readonly ApplicationDbContext _db;
-        public VillaAPIController(ApplicationDbContext db)
-        {
             _db = db;
         }
 
@@ -28,7 +28,14 @@ namespace MagicVilla_API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<VillaDTO>> GetVillas()
         {
-            return Ok(_db.Villas);
+            try
+            {
+                return Ok(_db.Villas);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error has occured. Msg: {ex.Message}");
+            }
         }
 
         [HttpGet("Get/{id}", Name = "GetVilla")]
@@ -51,15 +58,12 @@ namespace MagicVilla_API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<VillaDTO> CreateVilla([FromBody] VillaDTO villaDTO)
+        public ActionResult<VillaDTO> CreateVilla([FromBody] VillaCreateDTO villaDTO)
         {
             if (villaDTO == null)
                 return BadRequest(villaDTO);
-            
-            if (villaDTO.Id > 0)
-                return StatusCode(StatusCodes.Status500InternalServerError, "Villa ID should be zero.");
 
-            if (_db.Villas.FirstOrDefault(x => x.Name.Equals(villaDTO.Name, StringComparison.CurrentCultureIgnoreCase)) != null)
+            if (_db.Villas.FirstOrDefault(x => x.Name.ToLower().Equals(villaDTO.Name.ToLower())) != null)
             {
                 //return BadRequest("Villa already exists");
                 ModelState.AddModelError("CustomError", "Villa already exists");
@@ -81,7 +85,7 @@ namespace MagicVilla_API.Controllers
             _db.Villas.Add(model);
             _db.SaveChanges();
 
-            return CreatedAtRoute("GetVilla", new { id = villaDTO.Id}, villaDTO);
+            return CreatedAtRoute("GetVilla", new { id = model.Id}, model);
         }
 
         [HttpDelete("Delete/{id}", Name = "DeleteVilla")]
@@ -107,7 +111,7 @@ namespace MagicVilla_API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult UpdateVilla(int id, [FromBody]VillaDTO villaDTO)
+        public IActionResult UpdateVilla(int id, [FromBody]VillaUpdateDTO villaDTO)
         {
             if (villaDTO == null)
                 return BadRequest("Villa is null");
@@ -146,7 +150,7 @@ namespace MagicVilla_API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult UpdatePartialVilla(int id, JsonPatchDocument<VillaDTO> patch)
+        public IActionResult UpdatePartialVilla(int id, JsonPatchDocument<VillaUpdateDTO> patch)
         {
             if (patch == null)
                 return BadRequest("Document is null");
@@ -154,12 +158,12 @@ namespace MagicVilla_API.Controllers
             if (id == 0)
                 return BadRequest("Invalid ID");
 
-            var villa = _db.Villas.FirstOrDefault(x => x.Id == id);
+            var villa = _db.Villas.AsNoTracking().FirstOrDefault(x => x.Id == id); //AsNoTracking makes EF Core to not track the retrieved object
 
             if (villa == null)
                 return NotFound("Villa not found");
 
-            VillaDTO villaDTO = new()
+            VillaUpdateDTO villaDTO = new()
             {
                 Id = id,
                 Name = villa.Name,
