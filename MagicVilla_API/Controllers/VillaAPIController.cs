@@ -2,6 +2,7 @@
 using MagicVilla_API.Data;
 using MagicVilla_API.Models;
 using MagicVilla_API.Models.DTO;
+using MagicVilla_API.Repository.IRepository;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,10 +17,10 @@ namespace MagicVilla_API.Controllers
     public class VillaAPIController : ControllerBase
     {
         public ILogger<VillaAPIController> _logger { get; }
-        private readonly ApplicationDbContext _db;
+        private readonly IVillaRepository _db;
         private readonly IMapper _mapper;
 
-        public VillaAPIController(ILogger<VillaAPIController> logger, ApplicationDbContext db, IMapper mapper)
+        public VillaAPIController(ILogger<VillaAPIController> logger, IVillaRepository db, IMapper mapper)
         {
             _logger = logger;
             _db = db;
@@ -32,7 +33,7 @@ namespace MagicVilla_API.Controllers
         {
             try
             {
-                IEnumerable<Villa> villas = await _db.Villas.ToListAsync();
+                IEnumerable<Villa> villas = await _db.GetAllAsync();
                 return Ok(_mapper.Map<List<VillaDTO>>(villas));
             }
             catch (Exception ex)
@@ -53,7 +54,7 @@ namespace MagicVilla_API.Controllers
                 return BadRequest("Invalid ID");
             }
 
-            var villa = await _db.Villas.FirstOrDefaultAsync(x => x.Id == id);
+            var villa = await _db.GetAsync(x => x.Id == id);
             return villa == null ? NotFound("Villa not found") : Ok(_mapper.Map<VillaDTO>(villa));
         }
 
@@ -66,7 +67,7 @@ namespace MagicVilla_API.Controllers
             if (villaDTO == null)
                 return BadRequest(villaDTO);
 
-            if (await _db.Villas.FirstOrDefaultAsync(x => x.Name.ToLower().Equals(villaDTO.Name.ToLower())) != null)
+            if (await _db.GetAsync(x => x.Name.ToLower().Equals(villaDTO.Name.ToLower())) != null)
             {
                 //return BadRequest("Villa already exists");
                 ModelState.AddModelError("CustomError", "Villa already exists");
@@ -75,8 +76,7 @@ namespace MagicVilla_API.Controllers
 
             Villa model = _mapper.Map<Villa>(villaDTO);
 
-            await _db.Villas.AddAsync(model);
-            await _db.SaveChangesAsync();
+            await _db.CreateAsync(model);
 
             return CreatedAtRoute("GetVilla", new { id = model.Id}, model);
         }
@@ -90,12 +90,11 @@ namespace MagicVilla_API.Controllers
             if (id == 0)
                 return BadRequest("Invalid ID");
             
-            var villa = await _db.Villas.FirstOrDefaultAsync(x => x.Id == id);
+            var villa = await _db.GetAsync(x => x.Id == id);
             if (villa == null)
                 return NotFound("Villa not found");
 
-            _db.Villas.Remove(villa);
-            await _db.SaveChangesAsync();
+            await _db.RemoveAsync(villa);
 
             return Ok("Deleted");
         }
@@ -114,8 +113,7 @@ namespace MagicVilla_API.Controllers
 
             Villa model = _mapper.Map<Villa>(villaDTO);
 
-            _db.Villas.Update(model);
-            await _db.SaveChangesAsync();
+            await _db.UpdateAsync(model);
 
             return Ok("Villa updated");
         }
@@ -132,7 +130,7 @@ namespace MagicVilla_API.Controllers
             if (id == 0)
                 return BadRequest("Invalid ID");
 
-            var villa = await _db.Villas.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id); //AsNoTracking makes EF Core to not track the retrieved object
+            var villa = await _db.GetAsync(x => x.Id == id, tracked: false); //AsNoTracking makes EF Core to not track the retrieved object
 
             if (villa == null)
                 return NotFound("Villa not found");
@@ -145,8 +143,7 @@ namespace MagicVilla_API.Controllers
 
             Villa model = _mapper.Map<Villa>(villaDTO);
 
-            _db.Villas.Update(model);
-            await _db.SaveChangesAsync();
+            await _db.UpdateAsync(model);
 
             return Ok("Villa updated");
         }
