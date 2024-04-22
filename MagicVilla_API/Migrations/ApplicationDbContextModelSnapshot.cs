@@ -70,7 +70,7 @@ namespace MagicVilla_API.Migrations
                         {
                             Id = 1,
                             Amenity = "",
-                            CreatedAt = new DateTime(2024, 4, 22, 14, 20, 43, 314, DateTimeKind.Local).AddTicks(5293),
+                            CreatedAt = new DateTime(2024, 4, 18, 16, 47, 42, 339, DateTimeKind.Local).AddTicks(6508),
                             Details = "Details",
                             ImageUrl = "",
                             Name = "Name",
@@ -79,28 +79,6 @@ namespace MagicVilla_API.Migrations
                             SqrMt = 80,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
-                });
-
-            modelBuilder.Entity("MagicVilla_API.Models.VillaNumber", b =>
-                {
-                    b.Property<int>("VillaNumberId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VillaNumberId"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("SpecialDetails")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("VillaNumberId");
-
-                    b.ToTable("VillaNumbers");
                 });
 #pragma warning restore 612, 618
         }
