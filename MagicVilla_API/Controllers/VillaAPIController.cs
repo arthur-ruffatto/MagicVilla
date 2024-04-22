@@ -165,7 +165,7 @@ namespace MagicVilla_API.Controllers
 
                 await _db.RemoveAsync(villa);
 
-                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.StatusCode = HttpStatusCode.OK;
                 _response.IsSuccess = true;
                 _response.Result = "Villa deleted successfully";
 
@@ -209,7 +209,7 @@ namespace MagicVilla_API.Controllers
 
                 await _db.UpdateAsync(model);
 
-                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.StatusCode = HttpStatusCode.OK;
                 _response.IsSuccess = true;
                 _response.Result = "Villa updated successfully";
 

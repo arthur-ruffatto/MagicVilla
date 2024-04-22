@@ -6,7 +6,6 @@ namespace MagicVilla_API.Models.DTO
     {
         [Required]
         public int Id { get; set; }
-        [Required(ErrorMessage = "Name is required")]
         [MaxLength(30, ErrorMessage = "Name should be less than 30 characters")]
         public string Name { get; set; }
         public string Details { get; set; }
