@@ -1,6 +1,7 @@
 ﻿using MagicVilla_API.Data;
 using MagicVilla_API.Models;
 using MagicVilla_API.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace MagicVilla_API.Repository
 {
