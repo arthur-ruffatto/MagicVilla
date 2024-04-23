@@ -8,7 +8,7 @@ namespace MagicVilla_API.Models
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int VillaNumberId { get; set; }
         [ForeignKey("Villa")]
-        public int VilldaID { get; set; }
+        public int VillaID { get; set; }
         public required Villa Villa { get; set; }
         public string? SpecialDetails { get; set; }
         public DateTime CreatedAt { get; set; }
