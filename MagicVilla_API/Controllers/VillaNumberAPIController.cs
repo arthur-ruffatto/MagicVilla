@@ -13,13 +13,15 @@ namespace MagicVilla_API.Controllers
     public class VillaNumberAPIController : ControllerBase
     {
         private readonly IVillaNumberRepository _db;
+        private readonly IVillaRepository _dbVilla;
         private readonly IMapper _mapper;
         protected ApiResponse _response;
-        public VillaNumberAPIController(IVillaNumberRepository db, IMapper mapper)
+        public VillaNumberAPIController(IVillaNumberRepository db, IMapper mapper, IVillaRepository dbVilla)
         {
             _db = db;
             _mapper = mapper;
             _response = new();
+            _dbVilla = dbVilla;
         }
 
         [HttpGet("Get", Name = "GetAll")]
@@ -125,7 +127,14 @@ namespace MagicVilla_API.Controllers
                     _response.IsSuccess = false;
                     _response.ErrorMessages = new List<string>() { "Villa already exists" };
                     return BadRequest(_response);
+                }
 
+                if (await _dbVilla.GetAsync(x => x.Id == villaNumberCreateDTO.VillaId) == null)
+                {
+                    _response.StatusCode = HttpStatusCode.BadRequest;
+                    _response.IsSuccess = false;
+                    _response.ErrorMessages = new List<string>() { "Villa does not exist" };
+                    return BadRequest(_response);
                 }
 
                 VillaNumber model = _mapper.Map<VillaNumber>(villaNumberCreateDTO);
@@ -211,6 +220,14 @@ namespace MagicVilla_API.Controllers
                     _response.StatusCode = HttpStatusCode.BadRequest;
                     _response.IsSuccess = false;
                     _response.ErrorMessages = new List<string>() { "Invalid ID" };
+                    return BadRequest(_response);
+                }
+
+                if (await _dbVilla.GetAsync(x => x.Id == villaNumberUpdateDTO.VillaId) == null)
+                {
+                    _response.StatusCode = HttpStatusCode.BadRequest;
+                    _response.IsSuccess = false;
+                    _response.ErrorMessages = new List<string>() { "Villa does not exist" };
                     return BadRequest(_response);
                 }
 
